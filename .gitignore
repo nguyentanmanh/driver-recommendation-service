@@ -1,0 +1,8 @@
+**/run_env
+**/.ipynb_checkpoints
+**.Identifier
+**/__pycache__
+**/registry/local_registry.db
+data_pipeline/feature_repo/registry/
+**/artifacts/**.json
+**/artifacts/**.parquet
