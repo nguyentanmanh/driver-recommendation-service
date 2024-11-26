@@ -1,0 +1,8 @@
+protobuf==4.23.4
+pyspark==3.0.1
+feast[redis]==0.24.0
+numpy==1.26.4
+pendulum==2.1.2
+fastapi[standard]
+jsonpickle
+pandas
