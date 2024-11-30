@@ -20,4 +20,12 @@ cd data_pipeline && make build_image && make run_image
 
 ## 5. Deploy DAGs for data pipeline
 
-## 6. Run DAGs in airflow in UI
+## 6. Run DAGs: db_to_offline_store, materalize_offline_to_online, stream_to_store
+
+## 7. Build image for training pipeline
+
+bash training_pipeline/setup_env.sh && cd training_pipeline && make build_image && cd ..
+
+## 8. Copy DAGs in training_pipeline to airflow
+
+## 9. Run DAGs in airflow: training_pipeline
