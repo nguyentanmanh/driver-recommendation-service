@@ -16,4 +16,8 @@ cd data_pipeline/feature_repo && feast apply && cd ../..
 
 ## 4. Deploy feasture store service
 
-cd data_pipeline && make build_image
+cd data_pipeline && make build_image && make run_image
+
+## 5. Deploy DAGs for data pipeline
+
+## 6. Run DAGs in airflow in UI

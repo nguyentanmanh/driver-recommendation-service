@@ -10,7 +10,7 @@ from airflow.providers.docker.operators.docker import DockerOperator
 from utils import *
 
 class AppConst:
-    DOCKER_USER = Variable.get("DOCKER_USER", "mlopsvn")
+    DOCKER_USER = Variable.get("DOCKER_USER", "NguyenTanManh")
 
 
 class AppPath:
