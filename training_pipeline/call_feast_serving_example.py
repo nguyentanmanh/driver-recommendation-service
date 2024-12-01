@@ -3,12 +3,14 @@ import pandas as pd
 import jsonpickle.ext.pandas as jsonpickle_pandas
 from jsonpickle.unpickler import Unpickler
 from datetime import datetime
+import base64
+import pickle
 
 # Register pandas handlers with jsonpickle
 jsonpickle_pandas.register_handlers()
 
 # Define the URL of the FastAPI endpoint
-url = 'http://127.0.0.1:3000/get-offline-features'
+url = 'http://127.0.0.1:8000/get-offline-features'
 
 # Define the request payload
 payload = {
@@ -31,18 +33,26 @@ response = requests.post(url, json=payload, headers=headers)
 
 # Check if the request was successful
 if response.status_code == 200:
-    print("Response from server:")
     response_json = response.json()
-    # Use Unpickler to parse the response to a DataFrame
-    u = Unpickler()
-    df = u.restore(response_json)
-    print(df)
+    try:
+        # Decode and unpickle the DataFrame
+        decoded_values = base64.b64decode(response_json['values'])
+        df = pickle.loads(decoded_values)
+
+        # Apply metadata for columns and index
+        df.columns = response_json['columns']  # Set column names
+        df.index = response_json['index']  # Set the index explicitly
+
+        print("Reconstructed DataFrame:")
+        print(df)
+    except Exception as e:
+        print(f"Error reconstructing DataFrame: {e}")
 else:
     print(f"Failed to get response. Status code: {response.status_code}")
     print("Response content:", response.content)
 
 # Define the URL of the FastAPI endpoint
-url = 'http://127.0.0.1:3000/get-offline-features'
+url = 'http://127.0.0.1:8000/get-offline-features'
 
 orders = pd.read_csv("./data/driver_orders.csv", sep="\t")
 orders["event_timestamp"] = pd.to_datetime(orders["event_timestamp"])
@@ -67,41 +77,20 @@ response = requests.post(url, json=payload, headers=headers)
 
 # Check if the request was successful
 if response.status_code == 200:
-    print("Response from server:")
     response_json = response.json()
-    # Use Unpickler to parse the response to a DataFrame
-    u = Unpickler()
-    df = u.restore(response_json)
-    print(df)
-else:
-    print(f"Failed to get response. Status code: {response.status_code}")
-    print("Response content:", response.content)
+    try:
+        # Decode and unpickle the DataFrame
+        decoded_values = base64.b64decode(response_json['values'])
+        df = pickle.loads(decoded_values)
 
-# Define the URL of the FastAPI endpoint
-url = 'http://127.0.0.1:3000/get-online-features'
+        # Apply metadata for columns and index
+        df.columns = response_json['columns']  # Set column names
+        df.index = response_json['index']  # Set the index explicitly
 
-# Define the request payload
-payload = {
-    "driverIds": [1001, 1002, 1003]
-}
-
-# Define the headers
-headers = {
-    'accept': 'application/json',
-    'Content-Type': 'application/json'
-}
-
-# Make the POST request
-response = requests.post(url, json=payload, headers=headers)
-
-# Check if the request was successful
-if response.status_code == 200:
-    print("Response from server:")
-    response_json = response.json()
-    # Use Unpickler to parse the response to a DataFrame
-    u = Unpickler()
-    df = u.restore(response_json)
-    print(df)
+        print("Reconstructed DataFrame:")
+        print(df)
+    except Exception as e:
+        print(f"Error reconstructing DataFrame: {e}")
 else:
     print(f"Failed to get response. Status code: {response.status_code}")
     print("Response content:", response.content)

@@ -11,6 +11,8 @@ from pathlib import Path
 import os
 import sys
 import logging
+import base64
+import pickle
 
 class AppConst:
     LOG_LEVEL = logging.DEBUG
@@ -59,7 +61,7 @@ def read_root():
 
 @app.post("/get-offline-features")
 def post_offline_store(request_body: OfflineRequestBody):
-    request_body.convert_datetimes()  # Convert all datetime strings to datetime objects
+    request_body.convert_datetimes()
 
     store = FeatureStore(repo_path=AppPath.FEATURE_REPO)
     entity_df = pd.DataFrame.from_dict(
@@ -69,23 +71,52 @@ def post_offline_store(request_body: OfflineRequestBody):
         }
     )
     training_df = store.get_historical_features(
-        entity_df=entity_df, 
+        entity_df=entity_df,
         features=["driver_stats:acc_rate", "driver_stats:conv_rate", "driver_stats:avg_daily_trips"],
     ).to_df()
-    p = Pickler()
-    response = p.flatten(training_df)
-    Log().log.info(f"response from datasource store: ", {str(response)})
+
+    # Encode DataFrame into JSON-compatible format
+    response = {
+        "values": base64.b64encode(pickle.dumps(training_df)).decode("utf-8"),
+        "index": training_df.index.tolist(),  # Explicitly provide index
+        "columns": training_df.columns.tolist(),  # Explicitly provide columns
+    }
+
+    Log().log.info(f"response from datasource store: {response}")
     return response
 
 @app.post("/get-online-features")
 def post_online_store(request_body: OnlineRequestBody):
-    store = FeatureStore(repo_path=AppPath.FEATURE_REPO)
-    print(request_body.driverIds)
-    features = store.get_online_features(
-        features=["driver_stats:acc_rate", "driver_stats:conv_rate", "driver_stats:avg_daily_trips"],
-        entity_rows=[{"driver_id": driver_id} for driver_id in request_body.driverIds],
-    ).to_df()
-    p = Pickler()
-    response = p.flatten(features)
-    Log().log.info(f"response from online store: ", {str(response)})
-    return response
+    """
+    Fetches online features from the Feature Store for the provided driver IDs.
+    Serializes the response in a JSON-compatible format with Base64 encoding.
+    """
+    try:
+        # Initialize the feature store
+        store = FeatureStore(repo_path=AppPath.FEATURE_REPO)
+
+        # Prepare entity rows from request
+        entity_rows = [{"driver_id": driver_id} for driver_id in request_body.driverIds]
+
+        # Fetch online features as a DataFrame
+        features_df = store.get_online_features(
+            features=["driver_stats:acc_rate", "driver_stats:conv_rate", "driver_stats:avg_daily_trips"],
+            entity_rows=entity_rows,
+        ).to_df()
+
+        # Serialize the DataFrame
+        response = {
+            "values": base64.b64encode(pickle.dumps(features_df)).decode("utf-8"),
+            "index": features_df.index.tolist(),  # Explicitly include index
+            "columns": features_df.columns.tolist(),  # Explicitly include columns
+        }
+
+        # Log the response
+        Log().log.info(f"Response from online store: {response}")
+
+        # Return the response
+        return response
+    except Exception as e:
+        # Log the error
+        Log().log.error(f"Error in fetching online features: {e}")
+        return {"error": str(e)}, 500

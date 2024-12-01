@@ -5,5 +5,5 @@ driver = Entity(
     join_keys=["driver_id"],
     description="driver id",
     tags={},
-    owner="sang@gmail.com",
+    owner="datasource@gmail.com",
 )

@@ -21,7 +21,7 @@ driver_stats_view = FeatureView(
     online=True,
     source=driver_stats_batch_source,
     tags={},
-    owner="mlopsvn@gmail.com",
+    owner="nguyentanmanh@gmail.com",
 )
 
 
@@ -37,7 +37,7 @@ driver_stats_view = FeatureView(
     online=True,
     source=driver_stats_stream_source,
     tags={},
-    owner="stream_source_owner@gmail.com",
+    owner="nguyentanmanh@gmail.com",
 )
 def driver_stats_stream(df: DataFrame):
     from pyspark.sql.functions import col
