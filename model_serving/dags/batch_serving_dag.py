@@ -16,7 +16,7 @@ from utils import *
 
 
 class AppConst:
-    DOCKER_USER = Variable.get("DOCKER_USER", "mlopsvn")
+    DOCKER_USER = Variable.get("DOCKER_USER", "nguyentanmanh")
 
 
 class AppPath:
