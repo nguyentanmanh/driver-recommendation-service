@@ -29,3 +29,9 @@ bash training_pipeline/setup_env.sh && cd training_pipeline && make build_image 
 ## 8. Copy DAGs in training_pipeline to airflow
 
 ## 9. Run DAGs in airflow: training_pipeline
+
+## 10. Build image for batch serving 
+
+## 11. Copy DAGs in batch_serving to airflow
+
+## 12. Run DAGs: batch_serving_pipeline
