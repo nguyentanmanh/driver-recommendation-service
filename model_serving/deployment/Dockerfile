@@ -14,8 +14,8 @@ FROM python:3.9-buster
 COPY --from=build /opt/venv /opt/venv
 
 ENV PATH="/opt/venv/bin:$PATH"
-# ENV MLFLOW_TRACKING_URI="http://localhost:5000"
-ENV MLFLOW_TRACKING_URI="http://mlflow:5000"
+ENV MLFLOW_TRACKING_URI="http://localhost:5000"
+# ENV MLFLOW_TRACKING_URI="http://mlflow:5000"
 ENV BATCH_INPUT_FILE="./data/batch_request.csv"
 ENV REGISTERED_MODEL_FILE="./artifacts/registered_model_version.json"
 ENV MONITORING_SERVICE_API="http://monitoring:8309/iterate"
